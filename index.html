@@ -1,0 +1,210 @@
+<html>
+<head>
+	<title>RPG Demo</title>
+	<link rel="stylesheet" type="text/css" href="css/main.css">
+</head>
+<body>
+
+	<div class='container'>
+		<div id='player'></div>
+		<div id='enemies'></div>
+		<div id='fires'></div>
+	</div>
+
+	<script>
+
+	function Enemy() {
+		this.direction = 'right';
+		this.background_coordinates = {
+			x_coord: 0,
+			down: 0,
+			left: 33,
+			right: 66,
+			up: 99
+		}
+
+		this.initialize = function()
+		{
+			this.x = Math.floor(Math.random()*50)*10;
+			this.y = Math.floor(Math.random()*40)*10;
+		}
+
+		this.initialize();
+	}
+
+	function Player() {
+		this.x = 50;
+		this.y = 200;
+		this.direction = 'right';
+		this.background_coordinates = {
+			x_coord: 192,
+			down: 0,
+			left: 33,
+			right: 66,
+			up: 99
+		}
+
+		this.draw = function()
+		{
+			document.getElementById('player').innerHTML = "<div class='chr1' style='top: "+this.y+"px;left: "+this.x+"px; background-position: -"+(this.background_coordinates.x_coord+((this.x+this.y)/10%3)*32)+"px -"+this.background_coordinates[this.direction]+"px;'></div>";
+		}
+	}
+
+	function GameLoop() {
+		var player;
+		var enemies = [];
+		var fires = [];
+		var that = this;
+
+		this.shootFire = function()
+		{
+			var fire = {}
+			fire.direction = player.direction;
+			fire.x = player.x;
+			fire.y = player.y;
+			fires.push(fire);
+			console.log(player);
+			console.log(fire);
+
+		}
+
+		this.drawEnemies = function()
+		{
+			var content = '';
+
+			for(i in enemies)
+			{
+				var rand = Math.random()*11;
+
+				if(rand < 7)
+				{
+					if(enemies[i].direction == 'left'){
+						enemies[i].x -= 10;
+					}
+					else if(enemies[i].direction == 'right'){
+						enemies[i].x += 10;
+					}
+					else if(enemies[i].direction == 'up'){
+						enemies[i].y -= 10;
+					}
+					else {
+						enemies[i].y += 10;
+					}
+				}
+				else if(rand < 8)
+				{
+					enemies[i].x -= 10;
+					enemies[i].direction = 'left';
+				}
+				else if(rand < 9)
+				{
+					enemies[i].x += 10;
+					enemies[i].direction = 'right';
+				}
+				else if(rand < 10)
+				{
+					enemies[i].y -= 10;
+					enemies[i].direction = 'up';
+				}
+				else
+				{
+					enemies[i].y += 10;
+					enemies[i].direction = 'down';
+				}
+
+				content += "<div class='enemy1' style='top: "+enemies[i].y+"px;left: "+enemies[i].x+"px; background-position: -"+(enemies[i].background_coordinates.x_coord+((enemies[i].x+enemies[i].y)/10%3)*32)+"px -"+enemies[i].background_coordinates[enemies[i].direction]+"px;'></div>";
+			}
+
+			document.getElementById('enemies').innerHTML = content;
+		}
+
+		this.drawFires = function()
+		{
+			var content = '';
+
+			//see if fires went out of boundary
+			for(i in fires)
+			{
+				if(fires[i].x<0 || fires[i].x > 800)
+				{
+					fires[i]=fires[fires.length-1];
+					fires.pop();
+				}
+				else if(fires[i].y<0 || fires[i].y > 475)
+				{
+					fires[i]=fires[fires.length-1];
+					fires.pop();
+				}
+			}
+			for(i in fires)
+			{
+				if(fires[i].direction == 'right'){
+					fires[i].x += 10;
+				}
+				else if(fires[i].direction == 'left'){
+					fires[i].x -= 10;
+				}
+				else if(fires[i].direction == 'up'){
+					fires[i].y -= 10;
+				}
+				else {
+					fires[i].y += 10;
+				}
+				content += "<div class='fire' style='top:"+fires[i].y+"px; left:"+fires[i].x+"px;'></div>";
+			}
+			document.getElementById('fires').innerHTML = content;
+		}
+
+		this.initialize = function()
+		{
+			player = new Player();
+			enemies.push(new Enemy());
+			enemies.push(new Enemy());
+			enemies.push(new Enemy());
+			player.draw();
+		}
+
+		this.updatePlayerCoordinateAndDirection = function(x,y,direction)
+		{
+			player.x += x;
+			player.y += y;
+			player.direction = direction;
+			player.draw();
+		}
+
+		this.loop = function()
+		{
+			that.drawFires();
+			that.drawEnemies();
+		}
+
+		this.initialize();
+	}
+
+	var game = new GameLoop();
+	setInterval(game.loop, 100);
+
+	document.onkeydown = function(e)
+	{
+		console.log(e.keyCode);
+		if(e.keyCode == 37){
+			game.updatePlayerCoordinateAndDirection(-10,0,"left");
+		}
+		else if(e.keyCode == 39){
+			game.updatePlayerCoordinateAndDirection(10,0,"right");
+		}
+		else if(e.keyCode == 38){
+			game.updatePlayerCoordinateAndDirection(0,-10,"up");
+		}
+		else if(e.keyCode == 40){
+			game.updatePlayerCoordinateAndDirection(0,10,"down");
+		}
+		else if(e.keyCode == 32){
+			game.shootFire();
+		}
+	}
+
+	</script>
+
+</body>
+</html>
