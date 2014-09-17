@@ -65,7 +65,6 @@
 			fires.push(fire);
 			console.log(player);
 			console.log(fire);
-
 		}
 
 		this.drawEnemies = function()
@@ -125,12 +124,7 @@
 			//see if fires went out of boundary
 			for(i in fires)
 			{
-				if(fires[i].x<0 || fires[i].x > 800)
-				{
-					fires[i]=fires[fires.length-1];
-					fires.pop();
-				}
-				else if(fires[i].y<0 || fires[i].y > 475)
+				if(fires[i].x<0 || fires[i].x > 800 || fires[i].y<0 || fires[i].y > 475)
 				{
 					fires[i]=fires[fires.length-1];
 					fires.pop();
